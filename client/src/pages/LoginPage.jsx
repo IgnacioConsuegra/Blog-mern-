@@ -1,28 +1,44 @@
-import { useState } from 'react'
-
-export default function LoginPage(){
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  async function login(ev){
+import { useState } from "react";
+import {Navigate} from "react-router-dom";
+export default function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [redirect, setRedirect] = useState(false);
+  async function login(ev) {
     ev.preventDefault();
-    const response = await fetch('http://localhost:4000/login', {
-      method: 'Post',
-      body: JSON.stringify({username, password}),
-      headers: {'Content-type':'application/json'},
+    const response = await fetch("http://localhost:4000/login", {
+      method: "Post",
+      body: JSON.stringify({ username, password }),
+      headers: { "Content-type": "application/json" },
+      credentials: "include",
     });
-    console.log(response)
-    if(response.status === 400){
+    console.log(response);
+    if (!response.ok) {
       alert("Wrong username or password.");
+    } else {
+      alert("Data is correct.");
+      setRedirect(true)
     }
-    if(response.status === 200){
-      alert("Data is correct.")
-    }
+    
   }
-  return(
-    <form className='login' onSubmit={login}>
-      <input type='text' placeholder='username' value={username} onChange={ev => setUsername(ev.target.value)}/>
-      <input type='password' placeholder='password' value={password} onChange={ev => setPassword(ev.target.value)}/>
+  if(redirect) {
+      return <Navigate to={"/"} />;
+    }
+  return (
+    <form className="login" onSubmit={login}>
+      <input
+        type="text"
+        placeholder="username"
+        value={username}
+        onChange={ev => setUsername(ev.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="password"
+        value={password}
+        onChange={ev => setPassword(ev.target.value)}
+      />
       <button>Login</button>
     </form>
-  )
+  );
 }

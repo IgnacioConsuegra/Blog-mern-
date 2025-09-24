@@ -4,20 +4,21 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
-
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error("Error connecting to MongoDB:", err));
 
+const salt = bcrypt.genSaltSync(10);
+const secret = "asdfdsfasdfsadads";
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const userDoc = await User.create({
       username,
@@ -45,7 +46,12 @@ app.post("/login", async (req, res) => {
     }
 
     // If the password is valid, respond with success
-    res.status(200).json({ message: "Login successful", user: userDoc });
+    // res.status(200).json({ message: "Login successful", user: userDoc });
+
+    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+      if (err) throw err;
+      res.cookie("token", token).json("ok");
+    });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
