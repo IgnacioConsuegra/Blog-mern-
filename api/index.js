@@ -28,6 +28,29 @@ app.post("/register", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Find the user by username
+    const userDoc = await User.findOne({ username });
+    if (!userDoc) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    // Compare the provided password with the hashed password
+    const isPasswordValid = await bcrypt.compare(password, userDoc.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    // If the password is valid, respond with success
+    res.status(200).json({ message: "Login successful", user: userDoc });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.listen(process.env.PORT || 4000, () =>
   console.log(`🚀 Server running on port ${process.env.PORT || 4000}`)
 );
