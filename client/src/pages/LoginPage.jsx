@@ -12,18 +12,16 @@ export default function LoginPage() {
       headers: { "Content-type": "application/json" },
       credentials: "include",
     });
-    console.log(response);
     if (!response.ok) {
       alert("Wrong username or password.");
     } else {
-      alert("Data is correct.");
       setRedirect(true)
     }
     
   }
   if(redirect) {
-      return <Navigate to={"/"} />;
-    }
+    return <Navigate to={"/"} />;
+  }
   return (
     <form className="login" onSubmit={login}>
       <input

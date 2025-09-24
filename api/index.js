@@ -3,11 +3,17 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/User");
+const cookieParser = require("cookie-parser");
+
 const app = express();
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
+app.use(cookieParser());
+
 const jwt = require("jsonwebtoken");
+
 require("dotenv").config();
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
@@ -15,6 +21,7 @@ mongoose
 
 const salt = bcrypt.genSaltSync(10);
 const secret = "asdfdsfasdfsadads";
+
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
 
@@ -55,6 +62,17 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+app.get("/profile", (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secret, {}, (err, info) => {
+    // if (err) throw err;
+    res.json(info);
+  });
+});
+app.post("/logout", (req, res) => {
+  res.cookie("token", "").json("ok");
 });
 
 app.listen(process.env.PORT || 4000, () =>
