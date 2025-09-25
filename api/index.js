@@ -61,7 +61,11 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
   });
 });
 app.get("/post", async (req, res) => {
-  res.json(await Post.find().populate("author", ["username"]));
+  const posts = await Post.find()
+    .populate("author", ["username"])
+    .sort({ createdAt: -1 })
+    .limit(20);
+  res.json(posts);
 });
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
