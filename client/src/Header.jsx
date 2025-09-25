@@ -26,6 +26,7 @@ useEffect(() => {
       setUserInfo(null);
     });
 }, []);
+
   function logout() {
     fetch("http://localhost:4000/logout", {
       credentials: "include",

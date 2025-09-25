@@ -4,13 +4,15 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const cookieParser = require("cookie-parser");
+const multer = require("multer");
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
 
 const app = express();
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
 app.use(cookieParser());
-
-const jwt = require("jsonwebtoken");
+const uploadMiddleware = multer({ dest: "uploads/" });
 
 require("dotenv").config();
 
@@ -35,6 +37,15 @@ app.post("/register", async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+app.post("/post", uploadMiddleware.single("file"), (req, res) => {
+  const { originalname, path } = req.file;
+  const parts = originalname.split(".");
+  const ext = parts[parts.length - 1];
+  const newPath = path + "." + ext;
+  fs.renameSync(path, newPath);
+  res.json({ ext });
+  // res.json({ files: req.file });
 });
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;

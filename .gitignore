@@ -32,3 +32,5 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+api/uploads/
