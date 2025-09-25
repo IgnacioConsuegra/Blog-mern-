@@ -1,46 +1,56 @@
-import { useState } from "react";
+import { useContext, useState, useTransition } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
 export default function Header() {
-  const [userName, setUsername] = useState(null);
-  useEffect(() => {
-    try {
-      fetch("http://localhost:4000/profile", {
-        credentials: "include",
-      }).then(response => {
-        console.log(response)
-        if(!response.ok) return;
-        response.json().then(userInfo => {
-          setUsername(userInfo.username);
-        });
-      });
-    } catch (err){
-      if(err);
-    }
-  }, []);
+  const {setUserInfo, userInfo} = useContext(UserContext);
+useEffect(() => {
+  fetch("http://localhost:4000/profile", {
+    credentials: "include",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        setUserInfo(null);
+        return;
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data) {
+        setUserInfo(data);
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching profile:", err);
+      setUserInfo(null);
+    });
+}, []);
   function logout() {
     fetch("http://localhost:4000/logout", {
       credentials: "include",
       method: "POST",
     });
-    setUsername(null);
+    setUserInfo(null);
   }
+
+  const username = userInfo?.username;
+
   return (
     <header>
       <Link to="/" className="logo">
         My blog
       </Link>
       <nav>
-        {userName && (
+        {username && (
           <>
             <Link to={"/create"}>
-              Create new post <b>{userName}</b>
+              Create new post <b>{username}</b>
             </Link>
             <a onClick={logout}>Logout</a>
           </>
         )}
-        {!userName && (
+        {!username && (
           <>
             <Link to="/login">Login</Link>
             <Link to="/register">Register</Link>
