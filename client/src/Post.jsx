@@ -7,7 +7,7 @@ export default function Post({title, summary, cover, content, createdAt, author}
     <div className="post">
       <div className="image">
         <img
-          src="https://i0.wp.com/blog.utc.edu/news/files/2025/02/Robotic-Dogs-25-29.jpg?resize=880%2C627&ssl=1"
+          src={'http://localhost:4000/'+cover}
           alt=""
         />
       </div>
