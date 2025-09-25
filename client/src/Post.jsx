@@ -2,7 +2,7 @@ import { formatISO9075  } from "date-fns";
 
 
 
-export default function Post({title, summary, cover, content, createdAt}) {
+export default function Post({title, summary, cover, content, createdAt, author}) {
   return (
     <div className="post">
       <div className="image">
@@ -14,7 +14,7 @@ export default function Post({title, summary, cover, content, createdAt}) {
       <div className="texts">
         <h2>{title}</h2>
         <p className="info">
-          <span className="author">Ignacio C</span>
+          <span className="author">{author.username}</span>
           <time>{formatISO9075(new Date(createdAt))}</time>
         </p>
         <p className="summary">
