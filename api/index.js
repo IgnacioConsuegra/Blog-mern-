@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/User");
+const Post = require("./models/Post");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const jwt = require("jsonwebtoken");
@@ -38,34 +39,36 @@ app.post("/register", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-app.post("/post", uploadMiddleware.single("file"), (req, res) => {
+app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
   const { originalname, path } = req.file;
   const parts = originalname.split(".");
   const ext = parts[parts.length - 1];
   const newPath = path + "." + ext;
   fs.renameSync(path, newPath);
-  res.json({ ext });
-  // res.json({ files: req.file });
+  const { title, summary, content } = req.body;
+  const postDoc = await Post.create({
+    title,
+    summary,
+    content,
+    cover: newPath,
+  });
+  res.json(postDoc);
+});
+app.get("/post", async (req, res) => {
+  res.json(await Post.find());
 });
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Find the user by username
     const userDoc = await User.findOne({ username });
     if (!userDoc) {
       return res.status(400).json({ error: "Invalid username or password" });
     }
-
-    // Compare the provided password with the hashed password
     const isPasswordValid = await bcrypt.compare(password, userDoc.password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid username or password" });
     }
-
-    // If the password is valid, respond with success
-    // res.status(200).json({ message: "Login successful", user: userDoc });
-
     jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
       if (err) throw err;
       res.cookie("token", token).json({

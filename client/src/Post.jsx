@@ -1,4 +1,4 @@
-export default function Post() {
+export default function Post({title, summary, cover, content, createdAt}) {
   return (
     <div className="post">
       <div className="image">
@@ -8,13 +8,13 @@ export default function Post() {
         />
       </div>
       <div className="texts">
-        <h2>Full-house battery backup coming later this year</h2>
+        <h2>{title}</h2>
         <p className="info">
           <span className="author">Ignacio C</span>
-          <time>2023-01-06 16:45</time>
+          <time>{createdAt}</time>
         </p>
         <p className="summary">
-          Today its a special launch event, home backup power grid
+          {summary}
         </p>
       </div>
     </div>
