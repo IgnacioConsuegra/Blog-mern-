@@ -18,8 +18,6 @@ export default function Post({
         </Link>
       </div>
       <div className="texts">
-        <Link to={"/post/id"}></Link>
-
         <Link to={`/post/${_id}`}>
           <h2>{title}</h2>
         </Link>
